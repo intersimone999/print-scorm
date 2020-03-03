@@ -7,7 +7,7 @@ input = nil
 skip_existing = false
 
 Selenium::WebDriver::Firefox.path = "/usr/bin/firefox-beta"
-args = OptionParser.new do |opts|
+OptionParser.new do |opts|
     opts.banner = "Exports SCROM packages to PDF"
     
     opts.on("-ffirefox", "--firefox=firefox", "Path to firefox binary executable") do |firefox|
@@ -27,7 +27,7 @@ args = OptionParser.new do |opts|
         input = inp
     end
 
-    opts.on("-F", "--force", "Does not skip existing files") do
+    opts.on("-F", "--force", "Does not skip existing files") do |f|
         skip_existing = true
     end
     
@@ -35,17 +35,16 @@ args = OptionParser.new do |opts|
         puts opts
         exit
     end
-end
+end.parse!(ARGV)
 
 if !output || !output.end_with?(".pdf")
-    warn "The output file must be a PDF file"
+    warn "The output file must be a PDF file: #{output}"
     exit -1
 end
 
 if !input || !input.end_with?(".zip")
-    warn "The input file must be a valid ZIP file"
+    warn "The input file must be a valid ZIP file: #{input}"
     exit -1
 end
 
-args.parse!(ARGV)
 ExportSCROM.new(skip_existing).run(input, output)

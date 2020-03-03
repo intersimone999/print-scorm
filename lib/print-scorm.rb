@@ -20,6 +20,7 @@ class ExportSCROM
     
     def run(zipfile, target_name)
         @@browser = Watir::Browser.new :firefox unless @@browser
+        zipfile = File.join(Dir.pwd, zipfile) unless zipfile.start_with? "/"
         directory = File.dirname(zipfile)
         
         if @skip_existing && FileTest.exists?(target_name)
