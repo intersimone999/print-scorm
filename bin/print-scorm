@@ -1,0 +1,51 @@
+#!/usr/bin/ruby
+
+require_relative "../lib/print-scorm"
+
+output = nil
+input = nil
+skip_existing = false
+
+Selenium::WebDriver::Firefox.path = "/usr/bin/firefox-beta"
+args = OptionParser.new do |opts|
+    opts.banner = "Exports SCROM packages to PDF"
+    
+    opts.on("-ffirefox", "--firefox=firefox", "Path to firefox binary executable") do |firefox|
+        unless FileTest.file?(firefox)
+            warn "The specified Firefox path is not a file: #{firefox}"
+            exit -1
+        end
+        
+        Selenium::WebDriver::Firefox.path = firefox
+    end
+    
+    opts.on("-oOUTPUT", "--output=OUTPUT", "Path to output PDF file") do |out|
+        output = out
+    end
+    
+    opts.on("-iINPUT", "--input=INPUT", "Path to input ZIP file") do |inp|
+        input = inp
+    end
+
+    opts.on("-F", "--force", "Does not skip existing files") do
+        skip_existing = true
+    end
+    
+    opts.on("-h", "--help", "Prints this help") do
+        puts opts
+        exit
+    end
+end
+
+if !output || !output.end_with?(".pdf")
+    warn "The output file must be a PDF file"
+    exit -1
+end
+
+if !input || !input.end_with?(".zip")
+    warn "The input file must be a valid ZIP file"
+    exit -1
+end
+
+args.parse!(ARGV)
+ExportSCROM.new(skip_existing).run(input, output)
